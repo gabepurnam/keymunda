@@ -1,0 +1,41 @@
+version: '3.7'
+
+services:
+     
+  keycloak-db:
+    image: bitnami/postgresql:12.4.0
+    environment:
+      - POSTGRESQL_DATABASE=keycloak
+      - POSTGRESQL_USERNAME=keycloak
+      - POSTGRESQL_PASSWORD=keycloak
+      - POSTGRESQL_POSTGRES_PASSWORD=postgres
+    ports:
+    - 5433:5432
+    volumes:
+      - keycloak-db-data:/var/lib/postgresql/data
+
+  keycloak:
+    image: ivanfranchin/keycloak-clustered:latest
+    environment:
+      - KEYCLOAK_USER=admin
+      - KEYCLOAK_PASSWORD=admin
+      - DB_VENDOR=postgres
+      - DB_ADDR=keycloak-db
+      - DB_USER=keycloak
+      - DB_PASSWORD=keycloak
+      - JDBC_PARAMS=useSSL=false
+      - PROXY_ADDRESS_FORWARDING=true
+    ports:
+    - 8180:8080
+    - 8143:8443
+    external_links:
+      - keycloak-db:keycloak-db
+    volumes:
+      - keycloak-db-data:/opt/jboss/postgres_data
+    depends_on:
+      - keycloak-db
+    links:
+      - keycloak-db
+
+volumes:  
+  keycloak-db-data:  

@@ -1,0 +1,85 @@
+repositories:
+- name: stable
+  url: https://kubernetes-charts.storage.googleapis.com
+- name: bitnami
+  url: https://charts.bitnami.com/bitnami
+
+releases:
+  - name: camunda
+    namespace: keymunda
+    chart: ./charts/camunda
+    hooks:
+    - events: ["prepare"]
+      showlogs: true
+      command: "kubectl"
+      args: ["apply","-f","./charts/camunda/camunda-config.yaml"]
+    values:
+      - hostAliases:
+        - ip: YOUR_MINIKUBE_IP(IF_YOU_NEED)
+          hostnames:
+          - sso.localdev
+      - image:
+          repository: gabepurnam/keymunda
+          tag: latest
+      - ingress:
+          enabled: true
+          hosts:
+          - host: keymunda.localdev
+            paths:
+              - "/"
+          tls:
+          - hosts:
+              - keymunda.localdev
+      - metrics:
+          enabled: true
+      - extraEnv:
+          JAVA_HOME: /usr/lib/jvm/default-jvm/jre
+          JAVA_OPTS: "-Xmx768m -XX:MaxMetaspaceSize=256m -DKEYCLOAK_ISSUER_URL='https://sso.localdev/auth/realms/test' -DKEYCLOAK_ADMIN_URL='https://sso.localdev/auth/admin/realms/test' -Djavax.net.debug=SSL -DKEYCLOAK_CLIENT_ID='camunda-identity-service' -DKEYCLOAK_CLIENT_SECRET='7409b449-49b8-483d-8d9b-e2fbe43a44d6' -DKEYCLOAK_REALM='test' -DKC_PLUGIN_USERNAME_AS_ID=true -DKC_PLUGIN_GROUPPATH_AS_ID=true -DKC_PLUGIN_ADMIN_GROUP=camunda-admin -DKC_PLUGIN_DISABLE_SSL_VALIDATION=true -DKC_PLUGIN_ENABLE_AUTH_CHECK=true"
+          KEYCLOAK_HOST: sso.localdev
+          JMX_PROMETHEUS: true
+      - appConfig: camunda-config
+      - postgresql:
+          enabled: true
+          postgresqlUsername: "camunda"
+          postgresqlPassword: "camunda"
+          postgresqlDatabase: "camunda"
+          postgresqlPostgresPassword: "postgres"
+  - name: keycloak
+    namespace: keymunda
+    chart: ./charts/keycloak
+    values:
+      - ingress:
+          enabled: true
+          anotations:
+            nginx.ingress.kubernetes.io/ssl-redirect: "true"
+            nginx.ingress.kubernetes.io/affinity: "cookie"
+            nginx.ingress.kubernetes.io/session-cookie-path: "/"
+            nginx.ingress.kubernetes.io/session-cookie-name: "route"
+            nginx.ingress.kubernetes.io/session-cookie-expires: "1800"
+            nginx.ingress.kubernetes.io/session-cookie-max-age: "1800"
+          rules:
+            -
+              host: sso.localdev
+              paths:
+                - "/"
+          tls:
+            - hosts:
+                - sso.localdev
+#            - secretName: keycloak-cert
+      - extraEnv: |
+          - name: DB_USER
+            value: "keycloak"
+          - name: DB_PASSWORD
+            value: "keycloak"
+          - name: KEYCLOAK_PASSWORD
+            value: "admin"
+          - name: KEYCLOAK_USER
+            value: "admin"
+          - name: TZ
+            value: "America/Sao_Paulo"
+      - postgresql:
+          enabled: true
+          postgresqlUsername: "keycloak"
+          postgresqlPassword: "keycloak"
+          postgresqlDatabase: "keycloak"
+          postgresqlPostgresPassword: "postgres"

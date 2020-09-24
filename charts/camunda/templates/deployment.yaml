@@ -1,0 +1,92 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "camunda.fullname" . }}
+  labels:
+    {{- include "camunda.labels" . | nindent 4 }}
+spec:
+{{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+{{- end }}
+  selector:
+    matchLabels:
+      {{- include "camunda.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+    {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      labels:
+        {{- include "camunda.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "camunda.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      volumes:
+      - name: app-config
+        secret:
+          secretName: {{ .Values.appConfig }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            {{- range $key, $value := .Values.extraEnv }}
+            - name: {{ $key }}
+              value: "{{ $value }}"
+            {{- end }}
+            - name: DB_URL
+              value: jdbc:postgresql://{{ .Release.Name }}-postgresql:5432/{{ required "postgresql.postgresqlDatabase " .Values.postgresql.postgresqlDatabase  }}
+            - name: DB_USERNAME
+              value: {{ required "postgresql.postgresqlUsername " .Values.postgresql.postgresqlUsername  }}
+            - name: DB_PASSWORD
+              value: {{ required "postgresql.postgresqlPassword " .Values.postgresql.postgresqlPassword  }}
+            - name: DB_DRIVER
+              value: org.postgresql.Driver
+          volumeMounts:
+          - name: app-config
+            mountPath: /camunda/config/
+          ports:
+            - name: http
+              containerPort: {{ .Values.containerPort }}
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: {{  required "livenessDelay " .Values.livenessDelay  }}
+            timeoutSeconds: {{  required "livenessTimeout " .Values.livenessTimeout  }}
+            periodSeconds: {{  required "livenessPeriod " .Values.livenessPeriod  }}
+            failureThreshold: {{  required "livenessFailureThreshold  " .Values.livenessFailureThreshold   }}
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: {{  required "readinessDelay " .Values.readinessDelay  }}
+            timeoutSeconds: {{  required "readinessTimeout " .Values.readinessTimeout  }}
+            periodSeconds: {{  required "readinessPeriod " .Values.readinessPeriod  }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.hostAliases }}
+      hostAliases:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

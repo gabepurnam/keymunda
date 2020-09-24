@@ -1,0 +1,8 @@
+apiVersion: v1
+data:
+  keycloak.json: ewogICJyZWFsbSI6ICJ0ZXN0IiwKICAiYXV0aC1zZXJ2ZXItdXJsIjogIktFWUNMT0FLX0FVVEhfQUREUkVTUyIsCiAgInNzbC1yZXF1aXJlZCI6ICJub25lIiwKICAicmVzb3VyY2UiOiAiY2FtdW5kYS1pZGVudGl0eS1zZXJ2aWNlIiwKICAiY3JlZGVudGlhbHMiOiB7CiAgICAic2VjcmV0IjogIlhYWFhYWFhYLVhYWFgtWFhYWC1YWFhYLVhYWFhYWFhYWFhYWCIKICB9LAogICJjb25maWRlbnRpYWwtcG9ydCI6IDAKfQ==
+kind: Secret
+metadata:
+  creationTimestamp: null
+  name: camunda-config
+  namespace: keymunda

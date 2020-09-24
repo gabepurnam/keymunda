@@ -1,0 +1,10 @@
+{
+  "realm": "test",
+  "auth-server-url": "KEYCLOAK_AUTH_ADDRESS",
+  "ssl-required": "none",
+  "resource": "camunda-identity-service",
+  "credentials": {
+    "secret": "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
+  },
+  "confidential-port": 0
+}

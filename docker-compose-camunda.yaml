@@ -1,0 +1,35 @@
+version: '3.7'
+
+services:
+      
+  camunda-db:
+    image: bitnami/postgresql:12.4.0
+    environment:
+      - POSTGRESQL_DATABASE=camunda
+      - POSTGRESQL_USERNAME=camunda
+      - POSTGRESQL_PASSWORD=camunda
+      - POSTGRESQL_POSTGRES_PASSWORD=postgres
+    ports:
+    - 5432:5432
+    volumes:
+      - camunda-db-data:/var/lib/postgresql/data
+  
+  camunda:
+    image: keymunda
+    build: .
+    environment:
+      - JAVA_HOME=/usr/lib/jvm/default-jvm/jre
+      - JAVA_OPTS="-Xmx768m -XX:MaxMetaspaceSize=256m -DKEYCLOAK_ISSUER_URL='http://keycloak:8180/auth/realms/test' -DKEYCLOAK_ADMIN_URL='https://keycloak:8143/auth/admin/realms/test' -Djavax.net.debug=SSL -DKEYCLOAK_CLIENT_ID='camunda-identity-service' -DKEYCLOAK_CLIENT_SECRET='XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX' -DKEYCLOAK_REALM='test' -DKC_PLUGIN_USERNAME_AS_ID=true -DKC_PLUGIN_GROUPPATH_AS_ID=true -DKC_PLUGIN_ADMIN_GROUP=camunda-admin -DKC_PLUGIN_DISABLE_SSL_VALIDATION=true -DKC_PLUGIN_ENABLE_AUTH_CHECK=true"
+      - KEYCLOAK_HOST=localhost:8143
+      - JMX_PROMETHEUS=true
+      - DB_URL=jdbc:postgresql://camunda-db:5432/camunda 
+      - DB_USERNAME=camunda
+      - DB_PASSWORD=camunda
+      - DB_DRIVER=org.postgresql.Driver
+    ports:
+    - 8080:8080
+    volumes:
+     - ./config:/camunda/config
+
+volumes:
+  camunda-db-data:

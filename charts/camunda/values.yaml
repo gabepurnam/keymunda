@@ -1,0 +1,83 @@
+replicaCount: 1
+
+image:
+  repository: gabepurnam/keymunda
+  tag: "latest"
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+
+podAnnotations: {}
+
+podSecurityContext:
+  runAsUser: 1000
+
+securityContext: {}
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: true
+  annotations: {}
+  hosts:
+    - host: chart-example.local
+      paths: []
+  tls: []
+
+containerPort: 8080
+
+resources: {}
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 3
+  targetCPUUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+hostAliases: {}
+
+memoryRequests: '512Mi'
+cpuRequests: '100m'
+memoryLimits: '1024Mi'
+cpuLimits: '2500m'
+
+readinessPath: '/engine-rest/version'
+readinessDelay: 60
+readinessTimeout: 3
+readinessPeriod: 15
+
+livenessPath: '/engine-rest/version'
+livenessDelay: 60
+livenessTimeout: 3
+livenessPeriod: 15
+livenessFailureThreshold: 3
+
+extraEnv: []
+
+appConfig: ""
+
+appServer: ""
+
+databaseType: pod   # external or pod. Note: for pod the 'postgresql-pod' tag below needs to be true
+tags:
+  postgresql-pod: true
+
+postgresql:
+  postgresqlDatabase: "camunda"
+  postgresqlUsername: "camunda"
+  postgresqlUrl:      "camunda"
+  postgresqlPassword: "camunda"
+
