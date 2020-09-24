@@ -8,7 +8,7 @@ with [Keycloak](https://github.com/keycloak/keycloak), I found some refs.
 * https://github.com/camunda/camunda-bpm-identity-keycloak
 * https://github.com/iceman91176/camunda-bpm-auth-keycloak-sso
 * https://github.com/hmcts/chart-camunda
-
+* https://github.com/codecentric/helm-charts/tree/master/charts/keycloak
 
 The main work was on Dockerfile, where downloads of needed jars are made
 and some configs and adjusts made in the base image to configure keycloak
