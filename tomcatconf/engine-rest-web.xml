@@ -10,11 +10,6 @@
   </context-param>
   -->
 
-  <!-- rest bootstrap listener -->
-  <listener>
-    <listener-class>org.camunda.bpm.engine.rest.impl.web.bootstrap.RestContainerBootstrap</listener-class>
-  </listener>
-
   <listener>
     <listener-class>org.camunda.bpm.engine.rest.impl.FetchAndLockContextListener</listener-class>
   </listener>
@@ -54,7 +49,7 @@
     <dispatcher>REQUEST</dispatcher>
   </filter-mapping>
 
-<!-- Camunda Keycloak Authentication Filter -->
+  <!-- Camunda Keycloak Authentication Filter -->
   <filter>
     <filter-name>camunda-auth</filter-name>
     <filter-class>org.camunda.community.auth.keycloak.filter.KeycloakAuthenticationFilter</filter-class>

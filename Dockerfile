@@ -52,7 +52,6 @@ COPY --chown=camunda:camunda ./camunda-bpm-auth-keycloak-sso-1.0.jar /camunda/we
 # Modificando configuração do engine-rest para autenticar com keycloak
 COPY --chown=camunda:camunda ./tomcatconf/engine-rest-web.xml /camunda/webapps/engine-rest/WEB-INF/web.xml
 COPY --chown=camunda:camunda ./camunda-bpm-auth-keycloak-sso-1.0.jar /camunda/webapps/engine-rest/WEB-INF/lib/
-RUN wget https://repo1.maven.org/maven2/org/camunda/bpm/camunda-engine-rest/7.13.0/camunda-engine-rest-7.13.0-classes.jar -P /camunda/webapps/engine-rest/WEB-INF/lib/
 
 # Modificando arquivo de configuração da aplicação principal
 COPY --chown=camunda:camunda ./tomcatconf/bpm-platform.xml /camunda/conf/bpm-platform.xml
